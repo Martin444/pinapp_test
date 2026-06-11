@@ -304,23 +304,9 @@ La documentación completa se encuentra en la carpeta `docs/`:
 2. Ejecutar `flutter pub get` (resuelve workspace + package simultáneamente)
 3. Ejecutar `flutter run` (Android o iOS)
 
-## ✅ Entregables
-
-- ✅ Código fuente completo
-- ✅ Implementación de platform channels (iOS Swift + Android Kotlin)
-- ✅ Tests unitarios y de widgets
-- ✅ README detallado
-- ✅ Documentación en carpeta `docs/`
-
-## 📝 Notas
-
-- Si el candidato no cuenta con las herramientas para compilar la app en alguna de las plataformas, puede igualmente implementar la funcionalidad y dejarla disponible en el código del repositorio.
-- El objetivo es evaluar cómo resuelve el desafío y cómo se maneja aplicando cambios en los proyectos nativos.
-- Se valora la elección de patrones de diseño apropiados y la implementación de tests.
-
 ## 👨‍💻 Desarrollado por
 
-**PinApp Challenge** - Mobile Developer Flutter
+PinApp Challenge - Por Martin Farel
 
 ---
 
