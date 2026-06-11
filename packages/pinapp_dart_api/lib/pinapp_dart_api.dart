@@ -13,5 +13,4 @@ export 'by_feature/comments/data/usecase/get_comments_usecase.dart';
 
 export 'by_feature/likes/data/repository/like_repository.dart';
 export 'by_feature/likes/data/provider/like_provider.dart';
-export 'by_feature/likes/data/usecase/get_liked_posts_usecase.dart';
 export 'by_feature/likes/data/usecase/toggle_like_usecase.dart';

@@ -61,18 +61,18 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     if (state is PostLoaded) {
       final currentState = state as PostLoaded;
 
-      await _toggleLikeUseCase.execute(event.postId);
+      final isLiked = await _toggleLikeUseCase.execute(event.postId);
 
       final updatedPosts = currentState.posts.map((post) {
         if (post.id == event.postId) {
-          return post.copyWith(isLiked: event.isLiked);
+          return post.copyWith(isLiked: isLiked);
         }
         return post;
       }).toList();
 
       final updatedFilteredPosts = currentState.filteredPosts.map((post) {
         if (post.id == event.postId) {
-          return post.copyWith(isLiked: event.isLiked);
+          return post.copyWith(isLiked: isLiked);
         }
         return post;
       }).toList();

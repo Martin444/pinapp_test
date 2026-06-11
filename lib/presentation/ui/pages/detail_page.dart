@@ -5,7 +5,6 @@ import 'package:pinapp_material_ui/ui/templates/detail_template.dart';
 import 'package:pinapp_test/presentation/blocs/comment_bloc/comment_bloc.dart';
 import 'package:pinapp_test/presentation/blocs/comment_bloc/comment_event.dart';
 import 'package:pinapp_test/presentation/blocs/comment_bloc/comment_state.dart';
-import 'package:pinapp_test/presentation/blocs/like_cubit/like_cubit.dart';
 import 'package:pinapp_test/presentation/blocs/post_bloc/post_bloc.dart';
 import 'package:pinapp_test/presentation/blocs/post_bloc/post_event.dart';
 import 'package:pinapp_test/presentation/blocs/post_bloc/post_state.dart';
@@ -39,15 +38,18 @@ class _DetailPageState extends State<DetailPage> {
   Widget build(BuildContext context) {
     return BlocBuilder<PostBloc, PostState>(
       builder: (context, postState) {
-        bool isLiked = false;
-
-        if (postState is PostLoaded) {
-          final post = postState.posts.firstWhere(
-            (p) => p.id == widget.postId,
-            orElse: () => postState.posts.first,
+        if (postState is! PostLoaded) {
+          return const Scaffold(
+            appBar: null,
+            body: Center(child: CircularProgressIndicator()),
           );
-          isLiked = post.isLiked;
         }
+
+        final post = postState.posts.firstWhere(
+          (p) => p.id == widget.postId,
+          orElse: () => postState.posts.first,
+        );
+        final isLiked = post.isLiked;
 
         return BlocBuilder<CommentBloc, CommentState>(
           builder: (context, commentState) {
@@ -75,12 +77,8 @@ class _DetailPageState extends State<DetailPage> {
               isLiked: isLiked,
               onLikeTap: () {
                 context.read<PostBloc>().add(
-                      PostLikeUpdated(
-                        postId: widget.postId,
-                        isLiked: !isLiked,
-                      ),
+                      PostLikeUpdated(postId: widget.postId),
                     );
-                context.read<LikeCubit>().toggleLike(widget.postId);
               },
               onBackTap: () => Navigator.of(context).pop(),
               comments: comments,

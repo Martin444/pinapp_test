@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pinapp_material_ui/constants/colors.dart';
 
-class SearchInput extends StatelessWidget {
+class SearchInput extends StatefulWidget {
   final TextEditingController? controller;
   final String? hintText;
   final ValueChanged<String>? onChanged;
@@ -18,26 +18,63 @@ class SearchInput extends StatelessWidget {
   });
 
   @override
+  State<SearchInput> createState() => _SearchInputState();
+}
+
+class _SearchInputState extends State<SearchInput> {
+  bool _hasText = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller?.addListener(_onControllerChanged);
+    _hasText = widget.controller?.text.isNotEmpty ?? false;
+  }
+
+  @override
+  void didUpdateWidget(SearchInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller?.removeListener(_onControllerChanged);
+      widget.controller?.addListener(_onControllerChanged);
+      _hasText = widget.controller?.text.isNotEmpty ?? false;
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller?.removeListener(_onControllerChanged);
+    super.dispose();
+  }
+
+  void _onControllerChanged() {
+    final hasText = widget.controller?.text.isNotEmpty ?? false;
+    if (hasText != _hasText) {
+      setState(() => _hasText = hasText);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller,
-      focusNode: focusNode,
-      onChanged: onChanged,
+      controller: widget.controller,
+      focusNode: widget.focusNode,
+      onChanged: widget.onChanged,
       decoration: InputDecoration(
-        hintText: hintText ?? 'Buscar posts...',
+        hintText: widget.hintText ?? 'Buscar posts...',
         prefixIcon: const Icon(
           Icons.search,
           color: PinAppColors.gray,
         ),
-        suffixIcon: controller?.text.isNotEmpty ?? false
+        suffixIcon: _hasText
             ? IconButton(
                 icon: const Icon(
                   Icons.clear,
                   color: PinAppColors.gray,
                 ),
                 onPressed: () {
-                  controller?.clear();
-                  onClear?.call();
+                  widget.controller?.clear();
+                  widget.onClear?.call();
                 },
               )
             : null,

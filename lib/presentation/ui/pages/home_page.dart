@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pinapp_material_ui/models/post_item_data.dart';
 import 'package:pinapp_material_ui/ui/templates/home_template.dart';
-import 'package:pinapp_test/presentation/blocs/like_cubit/like_cubit.dart';
 import 'package:pinapp_test/presentation/blocs/post_bloc/post_bloc.dart';
 import 'package:pinapp_test/presentation/blocs/post_bloc/post_event.dart';
 import 'package:pinapp_test/presentation/blocs/post_bloc/post_state.dart';
@@ -65,16 +64,7 @@ class _HomePageState extends State<HomePage> {
           isLoading: isLoading,
           errorMessage: errorMessage,
           onLikeToggle: (postId) {
-            if (state is PostLoaded) {
-              final post = state.posts.firstWhere((p) => p.id == postId);
-              context.read<PostBloc>().add(
-                    PostLikeUpdated(
-                      postId: postId,
-                      isLiked: !post.isLiked,
-                    ),
-                  );
-              context.read<LikeCubit>().toggleLike(postId);
-            }
+            context.read<PostBloc>().add(PostLikeUpdated(postId: postId));
           },
           onPostTap: (postId, title, body) {
             Navigator.of(context).push(

@@ -28,19 +28,12 @@ class PostSearched extends PostEvent {
   List<Object?> get props => [query];
 }
 
-/// Evento para actualizar el estado de like de un post
-/// 
-/// [postId] ID del post
-/// [isLiked] Nuevo estado de like
+/// Evento para toggle like de un post
 class PostLikeUpdated extends PostEvent {
   final int postId;
-  final bool isLiked;
 
-  const PostLikeUpdated({
-    required this.postId,
-    required this.isLiked,
-  });
+  const PostLikeUpdated({required this.postId});
 
   @override
-  List<Object?> get props => [postId, isLiked];
+  List<Object?> get props => [postId];
 }
