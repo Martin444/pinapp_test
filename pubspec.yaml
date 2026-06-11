@@ -20,6 +20,8 @@ dependencies:
     path: packages/pinapp_dart_api
   pinapp_material_ui:
     path: packages/pinapp_material_ui
+  http: ^1.6.0
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
