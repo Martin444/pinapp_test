@@ -7,7 +7,7 @@
 ## Índice
 
 1. [Setup del Proyecto](01-setup.md) - Requisitos, instalación y dependencias
-2. [Arquitectura](02-architecture.md) - Clean Architecture, BLoC y flujo de datos
+2. [Arquitectura](02-architecture.md) - Clean Architecture, BLoC, UseCases y flujo de datos
 3. [Atomic Design](03-atomic-design.md) - Metodología de diseño de componentes
 4. [Platform Channels](04-platform-channels.md) - Comunicación con nativo (Swift/Kotlin)
 5. [Testing](05-testing.md) - Estrategia y ejemplos de tests
@@ -25,25 +25,36 @@ Si usas Obsidian, puedes navegar entre documentos usando los wikilinks:
 
 Aplicación Flutter que muestra un listado de posts con buscador, detalle de comentarios obtenidos desde nativo (Swift/Kotlin), y funcionalidad de likes.
 
-La app sigue una arquitectura limpia (Clean Architecture) con tres capas principales: [Domain](02-architecture.md), [Data](02-architecture.md) y [Presentation](02-architecture.md), usando BLoC para la gestión de estado y [Atomic Design](03-atomic-design.md) para la organización de la UI.
+La app sigue Clean Architecture con un workspace Dart que separa las capas data y domain en el package `pinapp_dart_api`, usando BLoC para la gestión de estado, UseCases para orquestar repositorios, y Atomic Design para la organización de la UI.
 
 ## Tecnologías
-- Flutter 3.x
-- Dart 3.x
+- Flutter 3.x / Dart 3.x
+- Pub Workspace (monorepo)
 - BLoC (flutter_bloc)
 - HTTP (http)
 - SharedPreferences
-- Platform Channels
+- Platform Channels (MethodChannel)
 
 ## Estructura del Proyecto
 
 ```
-lib/
-├── core/          # Theme, constants, platform channels
-├── data/          # Models, datasources, repositories
-├── domain/        # Entities, repository abstractions
-├── presentation/  # Blocs + Atomic Design UI
-└── main.dart
+PinApp/
+├── packages/
+│   └── pinapp_dart_api/    # API client (data + domain layers)
+│       ├── lib/
+│       │   ├── core/                    # API constants, CommentsChannel
+│       │   ├── by_feature/
+│       │   │   ├── posts/               # PostModel, PostRepository, PostProvider, GetPostsUseCase
+│       │   │   ├── comments/            # CommentModel, CommentRepository, CommentProvider, GetCommentsUseCase
+│       │   │   └── likes/               # LikeRepository, LikeProvider, GetLikedPostsUseCase, ToggleLikeUseCase
+│       │   └── pinapp_dart_api.dart     # Barrel export
+│       └── pubspec.yaml
+├── lib/
+│   ├── core/                 # Theme, colors (presentation only)
+│   ├── presentation/         # Blocs + UI (Atomic Design)
+│   └── main.dart
+├── pubspec.yaml              # Root workspace
+└── docs/                     # Documentación
 ```
 
 ## Recursos de API

@@ -6,12 +6,29 @@
 
 ## Arquitectura
 
-### Clean Architecture
+### Pub Workspace (Monorepo)
+```
+PinApp/                          # Root (presentation)
+├── packages/
+│   └── pinapp_dart_api/         # API client (data + domain layers)
+└── lib/                         # UI + BLoCs only
+```
+
+### Package `pinapp_dart_api` — by_feature
 ```
 lib/
-├── core/          # Theme, constants, platform channels, utilities
-├── domain/        # Entities, repository abstractions
-├── data/          # Models, datasources, repository implementations
+├── core/              # API constants, CommentsPlatformChannel
+├── by_feature/
+│   ├── posts/         # PostModel, PostRepository, PostProvider, GetPostsUseCase
+│   ├── comments/      # CommentModel, CommentRepository, CommentProvider, GetCommentsUseCase
+│   └── likes/         # LikeRepository, LikeProvider, GetLikedPostsUseCase, ToggleLikeUseCase
+└── pinapp_dart_api.dart  # Barrel export
+```
+
+### Root — Presentación
+```
+lib/
+├── core/          # Theme, colors, app_theme
 ├── presentation/  # Blocs + Atomic Design UI
 └── main.dart
 ```
@@ -19,6 +36,7 @@ lib/
 ### State Management
 - **BLoC** (flutter_bloc) para gestión de estado
 - **Cubit** para casos simples (likes)
+- **UseCases** para orquestar repositorios (GetPostsUseCase, GetCommentsUseCase, ToggleLikeUseCases)
 
 ### UI Layer - Atomic Design
 ```
@@ -48,10 +66,16 @@ lib/presentation/ui/
 - Testear widgets con `WidgetTester`
 
 ## Dependencias Principales
+
+### Root (pinapp_test)
 - `flutter_bloc`: State management
+
+### Package (pinapp_dart_api)
 - `http`: HTTP client para posts
 - `shared_preferences`: Persistencia de likes
 - `equatable`: Equality para BLoC states
+
+### Dev (ambos)
 - `mocktail`: Testing
 - `bloc_test`: Testing de BLoC
 
@@ -60,6 +84,7 @@ lib/presentation/ui/
 - **Método**: `getComments`
 - **Argumento**: `{"postId": int}`
 - **Implementación nativa**: iOS (Swift) y Android (Kotlin)
+- **Ubicación en Flutter**: `packages/pinapp_dart_api/lib/core/comments_channel.dart`
 
 ## Estilo Visual
 - **Paleta**: Colores PinApp (azul marino, rojo, turquesa)

@@ -6,7 +6,7 @@
 
 Los comentarios de cada post se obtienen desde código nativo usando Flutter Platform Channels. Esta implementación es un requisito clave del desafío técnico.
 
-El bridge está definido en `[[../lib/core/platform/comments_channel.dart|CommentsPlatformChannel]]`.
+El bridge está definido en `packages/pinapp_dart_api/lib/core/comments_channel.dart`.
 
 ## Channel Configuration
 
@@ -17,22 +17,27 @@ Arguments: {"postId": int}
 Return: List<Map<String, dynamic>> (JSON string)
 ```
 
-## Implementación Flutter
+## Implementación en el Package
 
 ```dart
-const platform = MethodChannel('com.pinapp.comments');
+// packages/pinapp_dart_api/lib/core/comments_channel.dart
+class CommentsPlatformChannel {
+  static const _channel = MethodChannel('com.pinapp.comments');
 
-Future<List<dynamic>> getComments(int postId) async {
-  final result = await platform.invokeMethod('getComments', {
-    'postId': postId,
-  });
-  return json.decode(result);
+  Future<List<dynamic>> getComments(int postId) async {
+    final result = await _channel.invokeMethod('getComments', {
+      'postId': postId,
+    });
+    return json.decode(result as String) as List<dynamic>;
+  }
 }
 ```
 
+Usado por `CommentProvider` dentro del mismo package.
+
 ## Implementación iOS (Swift)
 
-Archivo: `[[../ios/Runner/AppDelegate.swift|ios/Runner/AppDelegate.swift]]`
+Archivo: `ios/Runner/AppDelegate.swift`
 
 ```swift
 import Flutter
@@ -91,7 +96,7 @@ import UIKit
 
 ## Implementación Android (Kotlin)
 
-Archivo: `[[../android/app/src/main/kotlin/com/test/pinapp/pinapp_test/MainActivity.kt|android/.../MainActivity.kt]]`
+Archivo: `android/app/src/main/kotlin/com/test/pinapp/pinapp_test/MainActivity.kt`
 
 ```kotlin
 import android.os.Bundle
@@ -151,7 +156,11 @@ class MainActivity: FlutterActivity() {
 ## Diagrama de Flujo
 
 ```
-Flutter App
+Flutter App (root)
+  → PostBloc.add(CommentFetched(postId))
+  → GetCommentsUseCase.execute(postId)
+  → CommentProvider.getComments(postId)
+  → CommentsPlatformChannel.getComments(postId)
   → MethodChannel.invokeMethod('getComments', {'postId': 1})
   → iOS/Android recibe la llamada
   → Nativo hace HTTP a jsonplaceholder
@@ -159,6 +168,8 @@ Flutter App
   → Nativo devuelve JSON como String
   → Flutter recibe String y hace json.decode
   → Flutter mapea a CommentModel
+  → PostBloc emite CommentLoaded(comments)
+  → UI renderiza CommentTile list
 ```
 
 ## Manejo de Errores

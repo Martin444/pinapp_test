@@ -19,20 +19,26 @@ Desarrollar una aplicación Flutter que muestre un listado de posts con un busca
 
 ## 🏗️ Arquitectura
 
-El proyecto sigue los principios de **Clean Architecture** con tres capas principales:
+Monorepo con **Pub Workspace** que separa data/domain en un package independiente:
 
 ```
-lib/
-├── core/          # Theme, constants, platform channels
-├── domain/        # Entities, repository abstractions
-├── data/          # Models, datasources, repositories
-├── presentation/  # Blocs + Atomic Design UI
-└── main.dart
+PinApp/
+├── packages/
+│   └── pinapp_dart_api/    # API client (data + domain layers, by_feature)
+├── lib/                     # UI + BLoCs (presentación solamente)
+├── docs/                    # Documentación detallada
+└── pubspec.yaml             # Root workspace
 ```
+
+### Capas del Package (`pinapp_dart_api`)
+- **Models**: `PostModel`, `CommentModel` (Equatable + fromJson/toJson)
+- **Repositories**: Abstracciones con providers como implementación única
+- **UseCases**: Orquestan repositorios (GetPostsUseCase, GetCommentsUseCase, ToggleLikeUseCase, GetLikedPostsUseCase)
 
 ### State Management
 - **BLoC** (flutter_bloc) para gestión compleja de estado
 - **Cubit** para casos simples (likes)
+- **UseCases** para orquestar lógica de negocio
 
 ### UI Layer - Atomic Design
 ```
@@ -48,18 +54,24 @@ lib/presentation/ui/
 
 ## 📦 Dependencias
 
+### Root (Presentación)
 ```yaml
 dependencies:
   flutter_bloc: ^8.1.6      # State management
-  http: ^1.2.0               # HTTP client
-  shared_preferences: ^2.3.5 # Local storage
+  pinapp_dart_api:           # API client (path dependency)
+  cupertino_icons: ^1.0.8   # iOS style icons
+```
+
+### Package `pinapp_dart_api` (Data + Domain)
+```yaml
+dependencies:
+  http: ^1.2.0               # HTTP client para posts
+  shared_preferences: ^2.3.5 # Local storage (likes)
   equatable: ^2.0.7          # Equality utilities
-  cupertino_icons: ^1.0.8    # iOS style icons
 
 dev_dependencies:
-  bloc_test: ^9.1.7          # BLoC testing
   mocktail: ^1.0.4           # Mocking
-  flutter_lints: ^5.0.0      # Linting
+  bloc_test: ^9.1.7          # BLoC testing
 ```
 
 ## 🌐 Recursos de API
@@ -71,7 +83,7 @@ dev_dependencies:
 
 ### Platform Channels
 
-Los comentarios se obtienen desde código nativo usando Flutter Platform Channels:
+Los comentarios se obtienen desde código nativo usando Flutter Platform Channels, dentro del package `pinapp_dart_api`:
 
 - **Channel**: `com.pinapp.comments`
 - **Method**: `getComments`
@@ -81,12 +93,13 @@ Los comentarios se obtienen desde código nativo usando Flutter Platform Channel
 ### Flujo de Datos
 
 ```
-Flutter App
-  ├── HTTP Request → jsonplaceholder.typicode.com/posts (Posts)
-  └── MethodChannel → com.pinapp.comments
-       ├── iOS: Swift + URLSession
-       └── Android: Kotlin + HttpURLConnection
-            └── HTTP Request → jsonplaceholder.typicode.com/comments?postId={id}
+Flutter App (root)
+  → BLoC
+    → UseCase (orquesta repositorios)
+      → Provider (implementación)
+        → PostProvider: HTTP → jsonplaceholder (posts)
+        → CommentProvider: MethodChannel → Swift/Kotlin → jsonplaceholder (comments)
+        → LikeProvider: SharedPreferences (likes)
 ```
 
 ## 🎨 Estilo Visual
@@ -102,15 +115,22 @@ Flutter App
 
 ### Tests Implementados
 
-- **Unit Tests**: Repositories, datasources
-- **BLoC Tests**: PostBloc, CommentBloc, LikeCubit
-- **Widget Tests**: PostCard, CommentTile, SearchBar
+- **UseCase Tests**: GetPostsUseCase
+- **BLoC Tests**: PostBloc (con mocks de UseCases)
+- **Widget Tests**: PostCard, CommentTile
+- **Smoke Test**: App renders HomePage
 
 ### Ejecución de Tests
 
 ```bash
-# Todos los tests
+# Todos los tests (root + package)
 flutter test
+
+# Tests específicos
+flutter test test/presentation/bloc/post_bloc_test.dart
+
+# Tests del package
+cd packages/pinapp_dart_api && flutter test
 
 # Coverage
 flutter test --coverage
@@ -119,40 +139,42 @@ flutter test --coverage
 ## 📁 Estructura del Proyecto
 
 ```
-pinapp_test/
+PinApp/
+├── packages/
+│   └── pinapp_dart_api/
+│       ├── lib/
+│       │   ├── core/
+│       │   │   ├── api_constants.dart
+│       │   │   └── comments_channel.dart
+│       │   ├── by_feature/
+│       │   │   ├── posts/
+│       │   │   │   ├── models/post_model.dart
+│       │   │   │   └── data/
+│       │   │   │       ├── repository/post_repository.dart
+│       │   │   │       ├── provider/post_provider.dart
+│       │   │   │       └── usecase/get_posts_usecase.dart
+│       │   │   ├── comments/
+│       │   │   │   ├── models/comment_model.dart
+│       │   │   │   └── data/
+│       │   │   │       ├── repository/comment_repository.dart
+│       │   │   │       ├── provider/comment_provider.dart
+│       │   │   │       └── usecase/get_comments_usecase.dart
+│       │   │   └── likes/
+│       │   │       └── data/
+│       │   │           ├── repository/like_repository.dart
+│       │   │           ├── provider/like_provider.dart
+│       │   │           ├── usecase/get_liked_posts_usecase.dart
+│       │   │           └── usecase/toggle_like_usecase.dart
+│       │   └── pinapp_dart_api.dart
+│       └── pubspec.yaml
 ├── android/
 │   └── app/src/main/kotlin/.../MainActivity.kt
 ├── ios/
 │   └── Runner/AppDelegate.swift
 ├── lib/
 │   ├── core/
-│   │   ├── constants/
-│   │   │   ├── api_constants.dart
-│   │   │   └── colors.dart
-│   │   ├── theme/
-│   │   │   └── app_theme.dart
-│   │   └── platform/
-│   │       └── comments_channel.dart
-│   ├── data/
-│   │   ├── models/
-│   │   │   ├── post_model.dart
-│   │   │   └── comment_model.dart
-│   │   ├── datasources/
-│   │   │   ├── posts_api.dart
-│   │   │   ├── comments_channel.dart
-│   │   │   └── likes_local.dart
-│   │   └── repositories/
-│   │       ├── post_repository_impl.dart
-│   │       ├── comment_repository_impl.dart
-│   │       └── like_repository_impl.dart
-│   ├── domain/
-│   │   ├── entities/
-│   │   │   ├── post.dart
-│   │   │   └── comment.dart
-│   │   └── repositories/
-│   │       ├── post_repository.dart
-│   │       ├── comment_repository.dart
-│   │       └── like_repository.dart
+│   │   ├── constants/colors.dart
+│   │   └── theme/app_theme.dart
 │   ├── presentation/
 │   │   ├── blocs/
 │   │   │   ├── post_bloc/
@@ -191,12 +213,13 @@ pinapp_test/
 ├── test/
 │   ├── data/
 │   │   └── post_repository_impl_test.dart
-│   └── presentation/
-│       ├── bloc/
-│       │   └── post_bloc_test.dart
-│       └── widgets/
-│           ├── post_card_test.dart
-│           └── comment_tile_test.dart
+│   ├── presentation/
+│   │   ├── bloc/
+│   │   │   └── post_bloc_test.dart
+│   │   └── widgets/
+│   │       ├── post_card_test.dart
+│   │       └── comment_tile_test.dart
+│   └── widget_test.dart
 ├── docs/
 │   ├── README.md
 │   ├── 01-setup.md
@@ -215,7 +238,7 @@ La documentación completa se encuentra en la carpeta `docs/`:
 
 - **[docs/README.md](docs/README.md)** - Índice y overview de la documentación
 - **[docs/01-setup.md](docs/01-setup.md)** - Requisitos, instalación y dependencias
-- **[docs/02-architecture.md](docs/02-architecture.md)** - Arquitectura Clean, BLoC, flujo de datos
+- **[docs/02-architecture.md](docs/02-architecture.md)** - Arquitectura Clean, BLoC, UseCases, flujo de datos
 - **[docs/03-atomic-design.md](docs/03-atomic-design.md)** - Metodología Atomic Design
 - **[docs/04-platform-channels.md](docs/04-platform-channels.md)** - Comunicación nativa Swift/Kotlin
 - **[docs/05-testing.md](docs/05-testing.md)** - Estrategia y ejemplos de testing
@@ -232,7 +255,7 @@ La documentación completa se encuentra en la carpeta `docs/`:
 ## 🚀 Instalación
 
 1. Clonar el repositorio
-2. Ejecutar `flutter pub get`
+2. Ejecutar `flutter pub get` (resuelve workspace + package simultáneamente)
 3. Ejecutar `flutter run` (Android o iOS)
 
 ## ✅ Entregables
