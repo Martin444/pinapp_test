@@ -8,10 +8,20 @@ class CommentsPlatformChannel {
   );
 
   Future<List<dynamic>> getComments(int postId) async {
-    final String result = await _channel.invokeMethod(
-      PlatformChannelConstants.getCommentsMethod,
-      {PlatformChannelConstants.postIdKey: postId},
-    );
-    return json.decode(result) as List<dynamic>;
+    try {
+      final String result = await _channel.invokeMethod(
+        PlatformChannelConstants.getCommentsMethod,
+        {PlatformChannelConstants.postIdKey: postId},
+      );
+      return json.decode(result) as List<dynamic>;
+    } on MissingPluginException {
+      throw Exception(
+        'Platform channel not implemented: ${PlatformChannelConstants.channelName}',
+      );
+    } on FormatException catch (e) {
+      throw Exception('Invalid JSON response from native: $e');
+    } on TypeError catch (e) {
+      throw Exception('Unexpected type from native channel: $e');
+    }
   }
 }

@@ -37,6 +37,10 @@ android {
             signingConfig = signingConfigs.debug
         }
     }
+
+    dependencies {
+        testImplementation 'junit:junit:4.13.2'
+    }
 }
 
 flutter {
