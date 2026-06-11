@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pinapp_test/core/constants/colors.dart';
-import 'package:pinapp_test/presentation/ui/atoms/pin_app_text.dart';
+import 'package:pinapp_material_ui/constants/colors.dart';
+import 'package:pinapp_material_ui/ui/atoms/pin_app_text.dart';
 
-/// Molécula: Tile de comentario
-/// 
-/// Muestra un comentario con nombre, email y body
 class CommentTile extends StatelessWidget {
   final String name;
   final String email;

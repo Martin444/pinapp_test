@@ -8,6 +8,7 @@ environment:
 
 workspace:
   - packages/pinapp_dart_api
+  - packages/pinapp_material_ui
 
 dependencies:
   flutter:
@@ -17,6 +18,8 @@ dependencies:
   equatable: ^2.0.7
   pinapp_dart_api:
     path: packages/pinapp_dart_api
+  pinapp_material_ui:
+    path: packages/pinapp_material_ui
 
 dev_dependencies:
   flutter_test:

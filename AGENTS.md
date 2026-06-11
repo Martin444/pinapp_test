@@ -8,10 +8,11 @@
 
 ### Pub Workspace (Monorepo)
 ```
-PinApp/                          # Root (presentation)
+PinApp/                          # Root (app shell)
 ├── packages/
-│   └── pinapp_dart_api/         # API client (data + domain layers)
-└── lib/                         # UI + BLoCs only
+│   ├── pinapp_dart_api/         # API client (data + domain layers)
+│   └── pinapp_material_ui/     # UI components + theming
+└── lib/                         # BLoCs + organisms/templates/pages
 ```
 
 ### Package `pinapp_dart_api` — by_feature
@@ -25,27 +26,25 @@ lib/
 └── pinapp_dart_api.dart  # Barrel export
 ```
 
-### Root — Presentación
+### Package `pinapp_material_ui` — UI Kit
 ```
 lib/
-├── core/          # Theme, colors, app_theme
-├── presentation/  # Blocs + Atomic Design UI
+├── constants/         # Colores PinApp
+├── theme/             # ThemeData Material 3
+├── models/            # Data classes para parámetros (PostItemData, CommentItemData)
+├── ui/
+│   ├── atoms/         # Componentes básicos (Text, Button, Icon)
+│   ├── molecules/     # Combinación de átomos (PostCard, SearchBar, CommentTile)
+│   ├── organisms/     # Secciones de UI (PostList, PostDetail) — parametrizados
+│   └── templates/     # Layouts de página (HomeTemplate, DetailTemplate) — parametrizados
+└── pinapp_material_ui.dart  # Barrel export
+```
+
+### Root — App Shell
+```
+lib/
+├── presentation/  # BLoCs + Pages (conectan BLoCs → templates parametrizados)
 └── main.dart
-```
-
-### State Management
-- **BLoC** (flutter_bloc) para gestión de estado
-- **Cubit** para casos simples (likes)
-- **UseCases** para orquestar repositorios (GetPostsUseCase, GetCommentsUseCase, ToggleLikeUseCases)
-
-### UI Layer - Atomic Design
-```
-lib/presentation/ui/
-├── atoms/         # Componentes más básicos (Text, Button, Icon)
-├── molecules/     # Combinación de átomos (PostCard, SearchBar, CommentTile)
-├── organisms/     # Secciones de UI (PostList, PostDetail)
-├── templates/     # Layouts de página (HomeTemplate, DetailTemplate)
-└── pages/         # Pantallas completas (HomePage, DetailPage)
 ```
 
 ## Convenciones de Código
@@ -74,6 +73,11 @@ lib/presentation/ui/
 - `http`: HTTP client para posts
 - `shared_preferences`: Persistencia de likes
 - `equatable`: Equality para BLoC states
+
+### Package (pinapp_material_ui)
+- `flutter_bloc`: State management para UI components
+- Organisms y templates son completamente parametrizados (sin dependencia directa a BLoCs)
+- Reciben datos y callbacks desde las Pages a través del patrón de Inversión de Dependencias
 
 ### Dev (ambos)
 - `mocktail`: Testing

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pinapp_test/presentation/ui/atoms/search_input.dart';
+import 'package:pinapp_material_ui/ui/atoms/search_input.dart';
 
-/// Molécula: Barra de búsqueda
-/// 
-/// Combina un SearchInput con un contenedor estilizado
 class PostSearchBar extends StatelessWidget {
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;

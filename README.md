@@ -19,15 +19,16 @@ Desarrollar una aplicación Flutter que muestre un listado de posts con un busca
 
 ## 🏗️ Arquitectura
 
-Monorepo con **Pub Workspace** que separa data/domain en un package independiente:
+Monorepo con **Pub Workspace** que separa data/domain y UI en packages independientes:
 
 ```
 PinApp/
 ├── packages/
-│   └── pinapp_dart_api/    # API client (data + domain layers, by_feature)
-├── lib/                     # UI + BLoCs (presentación solamente)
-├── docs/                    # Documentación detallada
-└── pubspec.yaml             # Root workspace
+│   ├── pinapp_dart_api/      # API client (data + domain layers, by_feature)
+│   └── pinapp_material_ui/   # UI components + theming (Atomic Design)
+├── lib/                       # App shell: BLoCs + pages
+├── docs/                      # Documentación detallada
+└── pubspec.yaml               # Root workspace
 ```
 
 ### Capas del Package (`pinapp_dart_api`)
@@ -40,26 +41,35 @@ PinApp/
 - **Cubit** para casos simples (likes)
 - **UseCases** para orquestar lógica de negocio
 
-### UI Layer - Atomic Design
+### UI Layer - Atomic Design (en `pinapp_material_ui`)
 ```
-lib/presentation/ui/
-├── atoms/         # Componentes básicos (Text, Button, Icon)
-├── molecules/     # Combinación de átomos (PostCard, SearchBar, CommentTile)
-├── organisms/     # Secciones de UI (PostList, PostDetail)
-├── templates/     # Layouts de página (HomeTemplate, DetailTemplate)
-└── pages/         # Pantallas completas (HomePage, DetailPage)
+packages/pinapp_material_ui/lib/
+├── constants/     # Colores PinApp
+├── theme/         # ThemeData (Material 3)
+├── models/        # Data classes (PostItemData, CommentItemData)
+└── ui/
+    ├── atoms/         # Componentes básicos (Text, Button, Icon)
+    ├── molecules/     # Combinación de átomos (PostCard, SearchBar, CommentTile)
+    ├── organisms/     # Secciones de UI parametrizadas (PostList, PostDetail)
+    └── templates/     # Layouts de página parametrizados (HomeTemplate, DetailTemplate)
+
+lib/presentation/ui/pages/
+└── pages/         # Pantallas completas (HomePage, DetailPage) — conectan BLoCs → templates
 ```
+
+Organismos y templates siguen **Inversión de Dependencias**: no dependen de BLoCs, reciben datos y callbacks como parámetros desde las Pages.
 
 > 📚 **Documentación detallada**: Ver carpeta `docs/` para guías completas sobre cada parte del proyecto.
 
 ## 📦 Dependencias
 
-### Root (Presentación)
+### Root (App Shell)
 ```yaml
 dependencies:
-  flutter_bloc: ^8.1.6      # State management
-  pinapp_dart_api:           # API client (path dependency)
-  cupertino_icons: ^1.0.8   # iOS style icons
+  flutter_bloc: ^8.1.6         # State management
+  pinapp_dart_api:             # API client (path dependency)
+  pinapp_material_ui:          # UI components (path dependency)
+  cupertino_icons: ^1.0.8      # iOS style icons
 ```
 
 ### Package `pinapp_dart_api` (Data + Domain)
@@ -72,6 +82,12 @@ dependencies:
 dev_dependencies:
   mocktail: ^1.0.4           # Mocking
   bloc_test: ^9.1.7          # BLoC testing
+```
+
+### Package `pinapp_material_ui` (UI)
+```yaml
+dependencies:
+  flutter_bloc: ^8.1.6       # State management for UI components
 ```
 
 ## 🌐 Recursos de API
@@ -141,40 +157,67 @@ flutter test --coverage
 ```
 PinApp/
 ├── packages/
-│   └── pinapp_dart_api/
+│   ├── pinapp_dart_api/
+│   │   ├── lib/
+│   │   │   ├── core/
+│   │   │   │   ├── api_constants.dart
+│   │   │   │   └── comments_channel.dart
+│   │   │   ├── by_feature/
+│   │   │   │   ├── posts/
+│   │   │   │   │   ├── models/post_model.dart
+│   │   │   │   │   └── data/
+│   │   │   │   │       ├── repository/post_repository.dart
+│   │   │   │   │       ├── provider/post_provider.dart
+│   │   │   │   │       └── usecase/get_posts_usecase.dart
+│   │   │   │   ├── comments/
+│   │   │   │   │   ├── models/comment_model.dart
+│   │   │   │   │   └── data/
+│   │   │   │   │       ├── repository/comment_repository.dart
+│   │   │   │   │       ├── provider/comment_provider.dart
+│   │   │   │   │       └── usecase/get_comments_usecase.dart
+│   │   │   │   └── likes/
+│   │   │   │       └── data/
+│   │   │   │           ├── repository/like_repository.dart
+│   │   │   │           ├── provider/like_provider.dart
+│   │   │   │           ├── usecase/get_liked_posts_usecase.dart
+│   │   │   │           └── usecase/toggle_like_usecase.dart
+│   │   │   └── pinapp_dart_api.dart
+│   │   └── pubspec.yaml
+│   └── pinapp_material_ui/
 │       ├── lib/
-│       │   ├── core/
-│       │   │   ├── api_constants.dart
-│       │   │   └── comments_channel.dart
-│       │   ├── by_feature/
-│       │   │   ├── posts/
-│       │   │   │   ├── models/post_model.dart
-│       │   │   │   └── data/
-│       │   │   │       ├── repository/post_repository.dart
-│       │   │   │       ├── provider/post_provider.dart
-│       │   │   │       └── usecase/get_posts_usecase.dart
-│       │   │   ├── comments/
-│       │   │   │   ├── models/comment_model.dart
-│       │   │   │   └── data/
-│       │   │   │       ├── repository/comment_repository.dart
-│       │   │   │       ├── provider/comment_provider.dart
-│       │   │   │       └── usecase/get_comments_usecase.dart
-│       │   │   └── likes/
-│       │   │       └── data/
-│       │   │           ├── repository/like_repository.dart
-│       │   │           ├── provider/like_provider.dart
-│       │   │           ├── usecase/get_liked_posts_usecase.dart
-│       │   │           └── usecase/toggle_like_usecase.dart
-│       │   └── pinapp_dart_api.dart
+│       │   ├── constants/
+│       │   │   └── colors.dart
+│       │   ├── theme/
+│       │   │   └── app_theme.dart
+│       │   ├── models/
+│       │   │   ├── post_item_data.dart
+│       │   │   └── comment_item_data.dart
+│       │   ├── ui/
+│       │   │   ├── atoms/
+│       │   │   │   ├── pin_app_text.dart
+│       │   │   │   ├── pin_app_button.dart
+│       │   │   │   ├── like_icon.dart
+│       │   │   │   ├── search_input.dart
+│       │   │   │   └── badge_count.dart
+│       │   │   ├── molecules/
+│       │   │   │   ├── post_card.dart
+│       │   │   │   ├── search_bar.dart
+│       │   │   │   ├── comment_tile.dart
+│       │   │   │   └── like_button.dart
+│       │   │   ├── organisms/
+│       │   │   │   ├── post_list.dart
+│       │   │   │   └── post_detail.dart
+│       │   │   └── templates/
+│       │   │       ├── home_template.dart
+│       │   │       └── detail_template.dart
+│       │   ├── pinapp_material_ui.dart
+│       │   └── pubspec.yaml
 │       └── pubspec.yaml
 ├── android/
 │   └── app/src/main/kotlin/.../MainActivity.kt
 ├── ios/
 │   └── Runner/AppDelegate.swift
 ├── lib/
-│   ├── core/
-│   │   ├── constants/colors.dart
-│   │   └── theme/app_theme.dart
 │   ├── presentation/
 │   │   ├── blocs/
 │   │   │   ├── post_bloc/
@@ -189,23 +232,6 @@ PinApp/
 │   │   │       ├── like_cubit.dart
 │   │   │       └── like_state.dart
 │   │   └── ui/
-│   │       ├── atoms/
-│   │       │   ├── pin_app_text.dart
-│   │       │   ├── pin_app_button.dart
-│   │       │   ├── like_icon.dart
-│   │       │   ├── search_input.dart
-│   │       │   └── badge_count.dart
-│   │       ├── molecules/
-│   │       │   ├── post_card.dart
-│   │       │   ├── search_bar.dart
-│   │       │   ├── comment_tile.dart
-│   │       │   └── like_button.dart
-│   │       ├── organisms/
-│   │       │   ├── post_list.dart
-│   │       │   └── post_detail.dart
-│   │       ├── templates/
-│   │       │   ├── home_template.dart
-│   │       │   └── detail_template.dart
 │   │       └── pages/
 │   │           ├── home_page.dart
 │   │           └── detail_page.dart

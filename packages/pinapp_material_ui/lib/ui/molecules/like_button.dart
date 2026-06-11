@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pinapp_test/presentation/ui/atoms/like_icon.dart';
-import 'package:pinapp_test/presentation/ui/atoms/pin_app_text.dart';
+import 'package:pinapp_material_ui/ui/atoms/like_icon.dart';
+import 'package:pinapp_material_ui/ui/atoms/pin_app_text.dart';
 
-/// Molécula: Botón de like
-/// 
-/// Combina el icono de like con texto de contador
 class LikeButton extends StatelessWidget {
   final bool isLiked;
   final int count;

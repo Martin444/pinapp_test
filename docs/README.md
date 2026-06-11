@@ -25,7 +25,7 @@ Si usas Obsidian, puedes navegar entre documentos usando los wikilinks:
 
 Aplicación Flutter que muestra un listado de posts con buscador, detalle de comentarios obtenidos desde nativo (Swift/Kotlin), y funcionalidad de likes.
 
-La app sigue Clean Architecture con un workspace Dart que separa las capas data y domain en el package `pinapp_dart_api`, usando BLoC para la gestión de estado, UseCases para orquestar repositorios, y Atomic Design para la organización de la UI.
+La app sigue Clean Architecture con un workspace Dart que separa data/domain en `pinapp_dart_api` y UI components en `pinapp_material_ui`, usando BLoC para la gestión de estado, UseCases para orquestar repositorios, y Atomic Design para la organización de la UI.
 
 ## Tecnologías
 - Flutter 3.x / Dart 3.x
@@ -40,18 +40,29 @@ La app sigue Clean Architecture con un workspace Dart que separa las capas data 
 ```
 PinApp/
 ├── packages/
-│   └── pinapp_dart_api/    # API client (data + domain layers)
+│   ├── pinapp_dart_api/      # API client (data + domain layers)
+│   │   ├── lib/
+│   │   │   ├── core/                    # API constants, CommentsChannel
+│   │   │   ├── by_feature/
+│   │   │   │   ├── posts/               # PostModel, PostRepository, PostProvider, GetPostsUseCase
+│   │   │   │   ├── comments/            # CommentModel, CommentRepository, CommentProvider, GetCommentsUseCase
+│   │   │   │   └── likes/               # LikeRepository, LikeProvider, GetLikedPostsUseCase, ToggleLikeUseCase
+│   │   │   └── pinapp_dart_api.dart     # Barrel export
+│   │   └── pubspec.yaml
+│   └── pinapp_material_ui/  # UI components + theming
 │       ├── lib/
-│       │   ├── core/                    # API constants, CommentsChannel
-│       │   ├── by_feature/
-│       │   │   ├── posts/               # PostModel, PostRepository, PostProvider, GetPostsUseCase
-│       │   │   ├── comments/            # CommentModel, CommentRepository, CommentProvider, GetCommentsUseCase
-│       │   │   └── likes/               # LikeRepository, LikeProvider, GetLikedPostsUseCase, ToggleLikeUseCase
-│       │   └── pinapp_dart_api.dart     # Barrel export
+│       │   ├── constants/               # Colores PinApp
+│       │   ├── theme/                   # ThemeData Material 3
+│       │   ├── models/                  # Data classes (PostItemData, CommentItemData)
+│       │   ├── ui/atoms/                # Componentes básicos
+│       │   ├── ui/molecules/            # Combinación de átomos
+│       │   ├── ui/organisms/            # Secciones de UI parametrizadas
+│       │   ├── ui/templates/            # Layouts de página parametrizados
+│       │   └── pinapp_material_ui.dart  # Barrel export
 │       └── pubspec.yaml
 ├── lib/
-│   ├── core/                 # Theme, colors (presentation only)
-│   ├── presentation/         # Blocs + UI (Atomic Design)
+│   ├── presentation/blocs/   # BLoCs
+│   ├── presentation/ui/pages/# Pages (conectan BLoCs → templates)
 │   └── main.dart
 ├── pubspec.yaml              # Root workspace
 └── docs/                     # Documentación

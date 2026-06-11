@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pinapp_test/core/constants/colors.dart';
+import 'package:pinapp_material_ui/constants/colors.dart';
 
-/// ThemeData personalizado con los colores de PinApp
 class PinAppTheme {
   static ThemeData get theme {
     return ThemeData(

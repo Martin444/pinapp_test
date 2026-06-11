@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pinapp_test/core/constants/colors.dart';
-import 'package:pinapp_test/presentation/ui/atoms/like_icon.dart';
-import 'package:pinapp_test/presentation/ui/atoms/pin_app_text.dart';
+import 'package:pinapp_material_ui/constants/colors.dart';
+import 'package:pinapp_material_ui/ui/atoms/like_icon.dart';
+import 'package:pinapp_material_ui/ui/atoms/pin_app_text.dart';
 
-/// Molécula: Card de post
-/// 
-/// Combina átomos para mostrar información de un post
-/// con título, body y botón de like
 class PostCard extends StatelessWidget {
   final int id;
   final String title;

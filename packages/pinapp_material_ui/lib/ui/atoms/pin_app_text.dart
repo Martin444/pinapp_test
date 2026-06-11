@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Átomo: Texto con estilos de PinApp
-/// 
-/// Componente básico de texto que aplica los estilos del tema
 class PinAppText extends StatelessWidget {
   final String text;
   final TextStyle? style;

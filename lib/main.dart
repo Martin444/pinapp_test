@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pinapp_dart_api/pinapp_dart_api.dart';
-import 'package:pinapp_test/core/theme/app_theme.dart';
+import 'package:pinapp_material_ui/theme/app_theme.dart';
 import 'package:pinapp_test/presentation/blocs/comment_bloc/comment_bloc.dart';
 import 'package:pinapp_test/presentation/blocs/like_cubit/like_cubit.dart';
 import 'package:pinapp_test/presentation/blocs/post_bloc/post_bloc.dart';

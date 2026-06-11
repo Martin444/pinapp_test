@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pinapp_test/core/constants/colors.dart';
+import 'package:pinapp_material_ui/constants/colors.dart';
 
-/// Átomo: Campo de búsqueda
-/// 
-/// Componente básico de input para búsqueda
 class SearchInput extends StatelessWidget {
   final TextEditingController? controller;
   final String? hintText;

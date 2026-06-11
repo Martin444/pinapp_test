@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pinapp_test/core/constants/colors.dart';
+import 'package:pinapp_material_ui/constants/colors.dart';
 
-/// Átomo: Icono de like
-/// 
-/// Componente básico que muestra un icono de corazón
-/// Puede estar activo o inactivo
 class LikeIcon extends StatelessWidget {
   final bool isLiked;
   final double size;

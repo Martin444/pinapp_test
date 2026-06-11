@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pinapp_test/presentation/ui/molecules/post_card.dart';
+import 'package:pinapp_material_ui/ui/molecules/post_card.dart';
 
 void main() {
   group('PostCard', () {

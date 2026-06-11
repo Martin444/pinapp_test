@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pinapp_test/core/constants/colors.dart';
+import 'package:pinapp_material_ui/constants/colors.dart';
 
-/// Átomo: Badge de contador
-/// 
-/// Muestra un número en un círculo coloreado
 class BadgeCount extends StatelessWidget {
   final int count;
   final Color? backgroundColor;

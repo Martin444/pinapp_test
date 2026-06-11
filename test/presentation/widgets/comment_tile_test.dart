@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pinapp_test/presentation/ui/molecules/comment_tile.dart';
+import 'package:pinapp_material_ui/ui/molecules/comment_tile.dart';
 
 void main() {
   group('CommentTile', () {

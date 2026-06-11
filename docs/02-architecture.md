@@ -2,9 +2,9 @@
 
 > [[01-setup|← Setup del Proyecto]] | [[docs/README|Índice]] | [[03-atomic-design|Siguiente: Atomic Design →]]
 
-## Clean Architecture
+ ## Clean Architecture
 
-El proyecto se organiza en un workspace Dart con dos módulos:
+El proyecto se organiza en un workspace Dart con tres módulos:
 
 ### `packages/pinapp_dart_api` (Data + Domain)
 
@@ -34,17 +34,36 @@ lib/
                 └── toggle_like_usecase.dart
 ```
 
-### `lib/` (Presentación)
+### `packages/pinapp_material_ui` (UI Kit)
 
-Solo contiene UI y BLoCs:
+Contiene colores, tema, componentes UI reutilizables organizados por Atomic Design:
 
 ```
 lib/
-├── core/theme/       # Tema Material 3
-├── core/constants/   # Sólo colors.dart (presentación)
+├── constants/colors.dart       # Paleta de colores
+├── theme/app_theme.dart        # ThemeData Material 3
+├── models/
+│   ├── post_item_data.dart     # Data class para PostList/PostCard
+│   └── comment_item_data.dart  # Data class para PostDetail/CommentTile
+├── ui/
+│   ├── atoms/                  # Componentes básicos (Text, Button, Icon)
+│   ├── molecules/              # Combinación de átomos (PostCard, SearchBar, CommentTile)
+│   ├── organisms/              # Secciones de UI (PostList, PostDetail) — parametrizados
+│   └── templates/              # Layouts de página (HomeTemplate, DetailTemplate) — parametrizados
+└── pinapp_material_ui.dart     # Barrel export
+```
+
+Organisms y templates están completamente parametrizados (no dependen de BLoCs). Reciben datos y callbacks desde las Pages a través de Inversión de Dependencias.
+
+### `lib/` (App Shell)
+
+Solo contiene BLoCs y las Pages que conectan BLoCs con los templates/organisms del package:
+
+```
+lib/
 ├── presentation/
 │   ├── blocs/        # PostBloc, CommentBloc, LikeCubit
-│   └── ui/           # Atomic Design (atoms, molecules, organisms, templates, pages)
+│   └── ui/pages/     # HomePage, DetailPage (conectan BLoCs → templates)
 └── main.dart
 ```
 
@@ -93,37 +112,31 @@ UI ← BLoC ← UseCase ← Repository (abstraction) ← Provider (implementatio
 ## Diagrama de Capas
 
 ```
-┌─────────────────────────────────────────────────┐
-│                 PinApp (root)                    │
-│  ┌───────────────────────────────────────────┐  │
-│  │           Presentation                     │  │
-│  │  ┌────────┐  ┌─────────────────────────┐  │  │
-│  │  │  BLoC  │  │     Atomic Design       │  │  │
-│  │  └───┬────┘  └─────────────────────────┘  │  │
-│  └──────┼────────────────────────────────────┘  │
-│         │ depends on                            │
-│  ┌──────┴────────────────────────────────────┐  │
-│  │     pinapp_dart_api (package)             │  │
-│  │                                           │  │
-│  │  by_feature/posts/                        │  │
-│  │  ├── PostModel                            │  │
-│  │  ├── PostRepository (abstract)            │  │
-│  │  ├── PostProvider (impl, HTTP)            │  │
-│  │  └── GetPostsUseCase                     │  │
-│  │                                           │  │
-│  │  by_feature/comments/                     │  │
-│  │  ├── CommentModel                         │  │
-│  │  ├── CommentRepository (abstract)         │  │
-│  │  ├── CommentProvider (impl, Channel)      │  │
-│  │  └── GetCommentsUseCase                  │  │
-│  │                                           │  │
-│  │  by_feature/likes/                        │  │
-│  │  ├── LikeRepository (abstract)            │  │
-│  │  ├── LikeProvider (impl, SharedPrefs)     │  │
-│  │  ├── GetLikedPostsUseCase                │  │
-│  │  └── ToggleLikeUseCase                   │  │
-│  └───────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│                    PinApp (root)                         │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │                  Presentation                      │  │
+│  │  ┌───────────┐  ┌────────────────────────┐        │  │
+│  │  │   BLoC    │  │  Pages (Home/Detail)   │        │  │
+│  │  └───────────┘  └──────────┬─────────────┘        │  │
+│  │              │ injecta datos y callbacks           │  │
+│  └──────────────┼──────────────────────────────────────┘  │
+│                 │ depends on                              │
+│  ┌──────────────┴──────────────────────────────────────┐  │
+│  │              pinapp_material_ui (package)           │  │
+│  │  ┌──────────┐  ┌────────────────────────────────┐  │  │
+│  │  │ Constants│  │  UI (atoms → molecules →       │  │  │
+│  │  │ Theme    │  │       organisms → templates)   │  │  │
+│  │  │ Models   │  │  (parametrizados, sin BLoC)    │  │  │
+│  │  └──────────┘  └────────────────────────────────┘  │  │
+│  └─────────────────────────────────────────────────────┘  │
+│                 │ depends on                              │
+│  ┌──────────────┴──────────────────────────────────────┐  │
+│  │              pinapp_dart_api (package)              │  │
+│  │  by_feature/posts/   by_feature/comments/          │  │
+│  │  by_feature/likes/   Core (API/Channel)            │  │
+│  └─────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────┘
 ```
 
 ## Platform Channels

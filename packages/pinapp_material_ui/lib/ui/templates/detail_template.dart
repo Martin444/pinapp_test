@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:pinapp_test/presentation/ui/organisms/post_detail.dart';
+import 'package:pinapp_material_ui/models/comment_item_data.dart';
+import 'package:pinapp_material_ui/ui/organisms/post_detail.dart';
 
-/// Template: Layout de Detalle
-/// 
-/// Define la estructura de la página de detalle de un post
-/// Incluye AppBar con botón de back y PostDetail
 class DetailTemplate extends StatelessWidget {
   final String title;
   final String body;
   final bool isLiked;
   final VoidCallback? onLikeTap;
   final VoidCallback? onBackTap;
+  final List<CommentItemData> comments;
+  final bool commentsLoading;
+  final String? commentsError;
 
   const DetailTemplate({
     super.key,
@@ -19,6 +19,9 @@ class DetailTemplate extends StatelessWidget {
     this.isLiked = false,
     this.onLikeTap,
     this.onBackTap,
+    this.comments = const [],
+    this.commentsLoading = false,
+    this.commentsError,
   });
 
   @override
@@ -36,6 +39,9 @@ class DetailTemplate extends StatelessWidget {
         body: body,
         isLiked: isLiked,
         onLikeTap: onLikeTap,
+        comments: comments,
+        commentsLoading: commentsLoading,
+        commentsError: commentsError,
       ),
     );
   }

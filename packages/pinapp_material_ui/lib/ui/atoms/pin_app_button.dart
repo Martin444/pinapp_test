@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pinapp_test/core/constants/colors.dart';
+import 'package:pinapp_material_ui/constants/colors.dart';
 
-/// Átomo: Botón con estilos de PinApp
-/// 
-/// Componente básico de botón que aplica los estilos del tema
 class PinAppButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
