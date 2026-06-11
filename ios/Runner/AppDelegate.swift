@@ -25,7 +25,8 @@ private let log = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "com.pinapp",
       if call.method == "getComments" {
         if let args = call.arguments as? [String: Any],
            let postId = args["postId"] as? Int {
-          self.fetchComments(postId: postId, result: result)
+          let apiBaseUrl = args["apiBaseUrl"] as? String ?? API_BASE_URL
+          self.fetchComments(postId: postId, apiBaseUrl: apiBaseUrl, result: result)
         } else {
           result(FlutterError(
             code: "INVALID_ARGUMENT",
@@ -42,9 +43,9 @@ private let log = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "com.pinapp",
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
   
-  private func fetchComments(postId: Int, result: @escaping FlutterResult) {
-    os_log(.info, log: log, "Fetching comments for postId=%d", postId)
-    guard let url = URL(string: "\(API_BASE_URL)/comments?postId=\(postId)") else {
+  private func fetchComments(postId: Int, apiBaseUrl: String, result: @escaping FlutterResult) {
+    os_log(.info, log: log, "Fetching comments for postId=%d baseUrl=%{public}@", postId, apiBaseUrl)
+    guard let url = URL(string: "\(apiBaseUrl)/comments?postId=\(postId)") else {
       os_log(.error, log: log, "Invalid URL for postId=%d", postId)
       result(FlutterError(
         code: "INVALID_URL",

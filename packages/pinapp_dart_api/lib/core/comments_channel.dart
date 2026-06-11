@@ -6,12 +6,19 @@ class CommentsPlatformChannel {
   static const MethodChannel _channel = MethodChannel(
     PlatformChannelConstants.channelName,
   );
+  static final String _apiBaseUrl = const String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'https://jsonplaceholder.typicode.com',
+  );
 
   Future<List<dynamic>> getComments(int postId) async {
     try {
       final String result = await _channel.invokeMethod(
         PlatformChannelConstants.getCommentsMethod,
-        {PlatformChannelConstants.postIdKey: postId},
+        {
+          PlatformChannelConstants.postIdKey: postId,
+          'apiBaseUrl': _apiBaseUrl,
+        },
       );
       return json.decode(result) as List<dynamic>;
     } on MissingPluginException {

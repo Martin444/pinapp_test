@@ -95,6 +95,26 @@ dependencies:
 - **Posts**: `https://jsonplaceholder.typicode.com/posts`
 - **Comments**: `https://jsonplaceholder.typicode.com/comments?postId={id}`
 
+## ⚙️ Configuración por Environment
+
+La URL base de la API de comentarios (consumida desde código nativo) se configura mediante `--dart-define`:
+
+```bash
+# Valor por defecto (no hace falta pasarlo)
+flutter run
+
+# URL personalizada
+flutter run --dart-define=API_BASE_URL=https://custom-api.com
+
+# Release build
+flutter build apk --dart-define=API_BASE_URL=https://custom-api.com
+flutter build ios --dart-define=API_BASE_URL=https://custom-api.com
+```
+
+> **Default**: `https://jsonplaceholder.typicode.com` — definido en `packages/pinapp_dart_api/lib/core/comments_channel.dart:9` con `String.fromEnvironment('API_BASE_URL')`.
+
+El valor se pasa desde Dart al código nativo (Swift/Kotlin) como argumento del MethodChannel `apiBaseUrl`. Si no se provee, ambas plataformas usan el mismo default.
+
 ## 🔧 Implementación
 
 ### Platform Channels

@@ -34,8 +34,10 @@ class MainActivity: FlutterActivity() {
       when (call.method) {
         "getComments" -> {
           val postId = call.argument<Int>("postId")
+          val apiBaseUrl = call.argument<String>("apiBaseUrl")
+              ?: API_BASE_URL
           if (postId != null) {
-            fetchComments(postId, result)
+            fetchComments(postId, apiBaseUrl, result)
           } else {
             result.error(
               "INVALID_ARGUMENT",
@@ -49,11 +51,11 @@ class MainActivity: FlutterActivity() {
     }
   }
   
-  private fun fetchComments(postId: Int, result: MethodChannel.Result) {
-    Log.d(TAG, "Fetching comments for postId=$postId")
+  private fun fetchComments(postId: Int, apiBaseUrl: String, result: MethodChannel.Result) {
+    Log.d(TAG, "Fetching comments for postId=$postId baseUrl=$apiBaseUrl")
     executor.execute {
       try {
-        val url = URL("$API_BASE_URL/comments?postId=$postId")
+        val url = URL("$apiBaseUrl/comments?postId=$postId")
         Log.d(TAG, "Requesting: $url")
         val connection = url.openConnection() as HttpURLConnection
         
