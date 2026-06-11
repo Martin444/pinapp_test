@@ -9,10 +9,12 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
 
 class MainActivity: FlutterActivity() {
   private val CHANNEL = "com.pinapp.comments"
   private val executor = Executors.newSingleThreadExecutor()
+  private val isActivityAlive = AtomicBoolean(true)
   
   override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
     super.configureFlutterEngine(flutterEngine)
@@ -49,10 +51,12 @@ class MainActivity: FlutterActivity() {
           requestMethod = "GET"
           connectTimeout = 5000
           readTimeout = 5000
-          setRequestProperty("Content-Type", "application/json")
+          setRequestProperty("Accept", "application/json")
         }
         
         val responseCode = connection.responseCode
+        
+        if (!isActivityAlive.get()) return@execute
         
         if (responseCode == HttpURLConnection.HTTP_OK) {
           val response = connection.inputStream.bufferedReader().use { it.readText() }
@@ -67,6 +71,7 @@ class MainActivity: FlutterActivity() {
         
         connection.disconnect()
       } catch (e: Exception) {
+        if (!isActivityAlive.get()) return@execute
         result.error(
           "NETWORK_ERROR",
           e.message ?: "Unknown error",
@@ -78,6 +83,7 @@ class MainActivity: FlutterActivity() {
   
   override fun onDestroy() {
     super.onDestroy()
-    executor.shutdown()
+    isActivityAlive.set(false)
+    executor.shutdownNow()
   }
 }

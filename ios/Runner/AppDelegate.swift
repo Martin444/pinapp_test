@@ -7,7 +7,9 @@ import UIKit
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    let controller = window?.rootViewController as! FlutterViewController
+    guard let controller = window?.rootViewController as? FlutterViewController else {
+      fatalError("rootViewController is not FlutterViewController")
+    }
     let channel = FlutterMethodChannel(
       name: "com.pinapp.comments",
       binaryMessenger: controller.binaryMessenger
@@ -35,13 +37,38 @@ import UIKit
   }
   
   private func fetchComments(postId: Int, result: @escaping FlutterResult) {
-    let url = URL(string: "https://jsonplaceholder.typicode.com/comments?postId=\(postId)")!
+    guard let url = URL(string: "https://jsonplaceholder.typicode.com/comments?postId=\(postId)") else {
+      result(FlutterError(
+        code: "INVALID_URL",
+        message: "Could not construct URL for postId \(postId)",
+        details: nil
+      ))
+      return
+    }
     
     let task = URLSession.shared.dataTask(with: url) { data, response, error in
       if let error = error {
         result(FlutterError(
           code: "NETWORK_ERROR",
           message: error.localizedDescription,
+          details: nil
+        ))
+        return
+      }
+      
+      guard let httpResponse = response as? HTTPURLResponse else {
+        result(FlutterError(
+          code: "INVALID_RESPONSE",
+          message: "Response is not HTTP",
+          details: nil
+        ))
+        return
+      }
+      
+      guard (200...299).contains(httpResponse.statusCode) else {
+        result(FlutterError(
+          code: "HTTP_ERROR",
+          message: "Response code: \(httpResponse.statusCode)",
           details: nil
         ))
         return
